@@ -154,11 +154,22 @@ class DotDict(Dict):
 		for k, v in kwargs.items():
 			self[k] = to_dot_dict(v, cls, force=True)
 
+	def __getattr__(self, key):
+		""" 使用__missing__处理attr不存在的情况, 而不是直接抛出错误 """
+		return self.__getitem__(key)
+
 	def __missing__(self, key):
 		""" 处理 self[key] 不存在时的情况: 返回一个新的DotDict对象 """
 		obj = self.__class__()
 		super().__setitem__(key, obj)
 		return obj
+
+	def __add__(self, other):
+		""" 用于支持 dot_dict[a][b][c] += k 类似操作 """
+		if not self.keys():
+			return other
+		else:
+			return NotImplemented
 
 	def update(self, *args, **kwargs):
 		""" 
