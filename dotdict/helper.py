@@ -18,8 +18,9 @@ def to_dot_dict(value, type_, force=False):
 			return value
 		return type_(value)
 	elif isinstance(value, (list, tuple)):
+		# important: namedtuple不支持从迭代器创建实例;
 		return type(value)(
-			to_dot_dict(elem, type_, force) for elem in value
+			*(to_dot_dict(elem, type_, force) for elem in value)
 		)
 	else:
 		return value
@@ -39,8 +40,9 @@ def from_dot_dict(value, force=False):
 			return value
 		return {k: from_dot_dict(v, force) for k, v in value.items()}
 	elif isinstance(value, (list, tuple)):
+		# important: namedtuple不支持从迭代器创建实例;
 		return type(value)(
-			from_dot_dict(elem, force) for elem in value
+			*(from_dot_dict(elem, force) for elem in value)
 		)
 	else:
 		return value
